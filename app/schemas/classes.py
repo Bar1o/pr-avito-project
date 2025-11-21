@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Annotated, List, Optional
 from enum import Enum
+from datetime import datetime
 
 
 class PRStatus(str, Enum):
@@ -8,41 +9,35 @@ class PRStatus(str, Enum):
     MERGED = "MERGED"
 
 
-class User(BaseModel):
-    id: str  # unique
-    name: str
+class UserBase(BaseModel):
+    user_id: str
+    username: str
+    teamname: str
     is_active: bool
 
-    team: str  # maybe i need a method that gets user's team name
+
+class TeamCreate(BaseModel):
+    team_name: str
+    members: List[UserBase]
 
 
-class Team(BaseModel):
-    name: str  # must be a unique name
-    users: List[User] = []
+class TeamResponse(BaseModel):
+    pass
 
 
-class PullRequest(BaseModel):
-    id: str
-    name: str
-    author: User
-    status: PRStatus = PRStatus.OPEN
-    reviewers: List[str] = []
-    _MAX_REVIEWERS: int = 2
+class PullRequestCreate(BaseModel):
+    pull_request_id: str
+    pull_request_name: str
+    author_id: str
 
 
-class ReviewerService:
-    def __init__(self):
-        # check number of users in author's team available (isActive == True) (except the author)
-        # if available > 2: set two of them randomly
-        # if only 1 is av: set them
-        # if 0: set noone
-        self.teams: dict[str, Team] = {}
-        self.users: dict[str, User] = {}
-        self.prs: dict[str, PullRequest] = {}
+class PullRequestResponse(BaseModel):
+    pull_request_id: str
+    pull_request_name: str
+    author_id: str
+    status: PRStatus
+    assigned_reviewers: List[str]
+    created_at: Optional[datetime] = None
+    merged_at: Optional[datetime] = None
 
-    def is_available(user: User) -> bool:
-        pass
-
-    def update_reviewers(user_to_remove: User):
-        # change one of reviewers to one from available
-        pass
+    model_config = ConfigDict(from_attributes=True)

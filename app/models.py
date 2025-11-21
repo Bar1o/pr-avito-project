@@ -9,7 +9,6 @@ class Base(DeclarativeBase):
     pass
 
 
-# Many-to-Many relationship for PR Reviewers
 pr_reviewers = Table(
     "pr_reviewers",
     Base.metadata,
@@ -21,7 +20,7 @@ pr_reviewers = Table(
 class UserDB(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True)  # Using String as per API spec, or UUID
+    id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     team_name = Column(String, ForeignKey("teams.name"))
@@ -43,8 +42,8 @@ class PullRequestDB(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     author_id = Column(String, ForeignKey("users.id"))
-    status = Column(String, default="OPEN")  # Enum stored as string
-    created_at = Column(DateTime, default=datetime.utcnow)
+    status = Column(String, default="OPEN")
+    created_at = Column(DateTime, default=datetime.now)
     merged_at = Column(DateTime, nullable=True)
 
     reviewers = relationship("UserDB", secondary=pr_reviewers, back_populates="assigned_prs")
