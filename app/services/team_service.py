@@ -3,6 +3,7 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.schemas import Team, TeamMember, TeamResponseWrapper
 from app.models import TeamDB, UserDB
 from app.schemas.errors import ServiceException, ErrorCode
+from sqlalchemy import select, delete
 
 
 class TeamService:
@@ -10,38 +11,47 @@ class TeamService:
         self.session = session
         self.user_repo = UserRepository(session)
 
-    async def create_team(self, data: Team) -> TeamResponseWrapper:
+    async def create_team(self, data: Team) -> Team:
         """
-        Создает команду.
-        Создает пользователей (=участников команды).
+        Upsert = update + insert.
+        1. Создает команду, создает пользователей (=участников команды).
+        2. Обновляет команду: обновляет пользователей.
         """
         if await self.user_repo.get_team_by_name(data.team_name):
-            raise ServiceException(
-                code=ErrorCode.TEAM_EXISTS,
-                message="team_name already exists",
-                status_code=400,
-            )
+            existing_team_dto = await self.get_team(data.team_name)
+            existing_members_sorted = sorted(existing_team_dto.members, key=lambda x: x.user_id)
+            new_members_sorted = sorted(data.members, key=lambda x: x.user_id)
 
-        new_team = TeamDB(team_name=data.team_name)
+            if existing_members_sorted == new_members_sorted:
+                raise ServiceException(
+                    code=ErrorCode.TEAM_EXISTS,
+                    message="team already exists",
+                    status_code=400,
+                )
 
-        new_users = []
+        result = await self.session.execute(select(UserDB.user_id).where(UserDB.team_name == data.team_name))
+        current_user_ids = set(result.scalars().all())  # пользователи, которые уже есть в БД
+
+        incoming_user_ids = {member.user_id for member in data.members}
+        ids_to_delete = current_user_ids - incoming_user_ids
+        if ids_to_delete:
+            stmt_delete = delete(UserDB).where((UserDB.team_name == data.team_name) & (UserDB.user_id.in_(ids_to_delete)))
+            await self.session.execute(stmt_delete)
+
+        team = TeamDB(team_name=data.team_name)
+        await self.session.merge(team)
 
         for member in data.members:
-            # TODO: check if user exists globally, if exists, we add them
-            # if user doesn't exist, we create them
-
             user = UserDB(
                 user_id=member.user_id,
                 username=member.username,
+                team_name=data.team_name,
                 is_active=member.is_active,
-                team=new_team,
             )
-            new_users.append(user)
+            await self.session.merge(user)
 
-        await self.user_repo.create_team(new_team)
-        self.session.add_all(new_users)
         await self.session.commit()
-        return TeamResponseWrapper(team=data)
+        return team
 
     async def get_team(self, team_name: str) -> Team:
         team_db = await self.user_repo.get_team_by_name(team_name)
