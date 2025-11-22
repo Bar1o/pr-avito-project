@@ -9,7 +9,15 @@ from app.services.team_service import TeamService
 router = APIRouter()
 
 
-@router.post("/add", response_model=Team, status_code=201, responses={400: {"model": ErrorResponse}})
+@router.post(
+    "/add",
+    response_model=Team,
+    status_code=201,
+    responses={
+        201: {"model": Team, "description": "Команда создана"},
+        400: {"model": ErrorResponse, "description": "Команда уже существует"},
+    },
+)
 async def add_team(team_data: Team, db: AsyncSession = Depends(get_db)):
     service = TeamService(db)
     return await service.create_team(team_data)
