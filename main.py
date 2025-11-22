@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
-from app.api.endpoints import pull_requests, teams
+from app.api.endpoints import pull_requests, teams, users  # Added users
 from app.db.session import engine
-from app.models import Base, UserDB, TeamDB, PullRequestDB
+from app.models import Base
 from app.schemas.errors import ServiceException, ErrorResponse, ErrorDetails
 
 
@@ -29,6 +29,7 @@ async def service_exception_handler(request: Request, exc: ServiceException):
 
 app.include_router(pull_requests.router, prefix="/pullRequest", tags=["PullRequests"])
 app.include_router(teams.router, prefix="/team", tags=["Teams"])
+app.include_router(users.router, prefix="/users", tags=["Users"])
 
 if __name__ == "__main__":
     import uvicorn
