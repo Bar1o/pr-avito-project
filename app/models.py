@@ -19,7 +19,7 @@ class UserDB(Base):
 
     user_id = Column(String, primary_key=True)
     username = Column(String, nullable=False)
-    team_name = Column(String, ForeignKey("teams.team_name"))  # Fixed: points to team_name
+    team_name = Column(String, ForeignKey("teams.team_name"))
     is_active = Column(Boolean, default=True)
 
     team = relationship("TeamDB", back_populates="members")

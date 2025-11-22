@@ -9,11 +9,9 @@ class PRRepository:
         self.session = session
 
     async def get_by_id(self, pr_id: str) -> PullRequestDB | None:
-        query = select(PullRequestDB).options(selectinload(PullRequestDB.reviewers)).where(PullRequestDB.id == pr_id)
+        query = select(PullRequestDB).options(selectinload(PullRequestDB.reviewers)).where(PullRequestDB.pull_request_id == pr_id)
         result = await self.session.execute(query)
         return result.scalars().first()
 
     async def create(self, pr: PullRequestDB):
         self.session.add(pr)
-        await self.session.flush()
-        return pr
