@@ -19,7 +19,7 @@ class UserService:
 
         return UserResponseWrapper(
             user=User(
-                user_id=user.id,
+                user_id=user.user_id,
                 username=user.username,
                 team_name=user.team_name,
                 is_active=user.is_active,

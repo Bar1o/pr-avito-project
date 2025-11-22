@@ -17,6 +17,9 @@ class TeamService:
         1. Создает команду, создает пользователей (=участников команды).
         2. Обновляет команду: обновляет пользователей.
         """
+        unique_members_map = {member.user_id: member for member in data.members}
+        data.members = list(unique_members_map.values())
+
         if await self.user_repo.get_team_by_name(data.team_name):
             existing_team_dto = await self.get_team(data.team_name)
             existing_members_sorted = sorted(existing_team_dto.members, key=lambda x: x.user_id)
@@ -51,7 +54,7 @@ class TeamService:
             await self.session.merge(user)
 
         await self.session.commit()
-        return team
+        return data
 
     async def get_team(self, team_name: str) -> Team:
         team_db = await self.user_repo.get_team_by_name(team_name)

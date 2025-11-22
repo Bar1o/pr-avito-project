@@ -39,7 +39,7 @@ class PRService:
 
         team_members = await self.user_repo.get_team_members(author.team_name)
 
-        candidates = [u for u in team_members if u.is_active and u.id != author.id]
+        candidates = [u for u in team_members if u.is_active and u.user_id != author.user_id]
 
         k = min(len(candidates), 2)
         selected_reviewers = random.sample(candidates, k)
@@ -47,9 +47,9 @@ class PRService:
         new_pr = PullRequestDB(
             pull_request_id=data.pull_request_id,
             pull_request_name=data.pull_request_name,
-            author_id=author.author_id,
+            author_id=author.user_id,
             status="OPEN",
-            assigned_reviewers=selected_reviewers,
+            reviewers=selected_reviewers,
         )
         await self.pr_repo.create(new_pr)
         await self.session.commit()
