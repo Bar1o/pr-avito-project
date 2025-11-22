@@ -1,10 +1,11 @@
 import random
-from fastapi import HTTPException
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import PullRequestDB
 from app.repositories.pr_repository import PRRepository
 from app.repositories.user_repository import UserRepository
-from app.schemas.classes import PullRequestCreate, PullRequestResponse
+from app.schemas.schemas import PullRequestCreate, PullRequestResponse
+from app.schemas.errors import ServiceException, ErrorResponse, ErrorCode
 
 
 class PRService:
@@ -15,11 +16,26 @@ class PRService:
 
     async def create_pr(self, data: PullRequestCreate) -> PullRequestResponse:
         if await self.pr_repo.get_by_id(data.pull_request_id):
-            raise HTTPException(status_code=409, detail="PR exists")
+            raise ServiceException(
+                code=ErrorCode.TEAM_EXISTS,
+                message="PR id already exists",
+                status_code=409,
+            )
 
         author = await self.user_repo.get_by_id(data.author_id)
         if not author:
-            raise HTTPException(status_code=404, detail="Author not found")
+            raise ServiceException(
+                code=ErrorCode.NOT_FOUND,
+                message="author not found",
+                status_code=404,
+            )
+
+        if not author.team_name:
+            raise ServiceException(
+                code=ErrorCode.NOT_FOUND,
+                message="team not found",
+                status_code=404,
+            )
 
         team_members = await self.user_repo.get_team_members(author.team_name)
 

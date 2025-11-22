@@ -9,20 +9,22 @@ class PRStatus(str, Enum):
     MERGED = "MERGED"
 
 
-class UserBase(BaseModel):
+class User(BaseModel):
     user_id: str
     username: str
     teamname: str
     is_active: bool
 
 
-class TeamCreate(BaseModel):
+class TeamMember(BaseModel):
+    user_id: str
+    username: str
+    is_active: bool
+
+
+class Team(BaseModel):
     team_name: str
-    members: List[UserBase]
-
-
-class TeamResponse(BaseModel):
-    pass
+    members: List[TeamMember]
 
 
 class PullRequestCreate(BaseModel):

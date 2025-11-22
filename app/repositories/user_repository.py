@@ -14,3 +14,10 @@ class UserRepository:
     async def get_team_members(self, team_name: str) -> list[UserDB]:
         result = await self.session.execute(select(UserDB).where(UserDB.team_name == team_name))
         return list(result.scalars().all())
+
+    async def create_team(self, team: TeamDB):
+        self.session.add(team)
+
+    async def get_team_by_name(self, name: str) -> TeamDB:
+        result = await self.session.execute(select(TeamDB).where(TeamDB.name == name))
+        return result.scalars().first()
