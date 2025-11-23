@@ -17,8 +17,7 @@
 git clone https://github.com/Bar1o/pr-avito-project.git
 cd pr-avito-project
 ```
-2. По `.env.example` создать `.env` файл и заполнить его
-3. Запустить докер командой
+2. Запустить докер командой
 ```bash
 docker-compose up
 ```
@@ -52,6 +51,9 @@ docker-compose down
 ```bash
 pip install -r requirements-dev.txt
 ```
+
+По `.env.example` создать `.env` файл и заполнить его.
+
 
 ### Проверка качества кода
 Для проверки кода используются **Ruff** (линтер + форматтер) и **Mypy** (типизация).
