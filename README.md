@@ -27,16 +27,6 @@ docker-compose up
 docker-compose down
 ```
 
-## ⚙️ Конфигурация (.env)
-
-| Переменная | Описание | Значение по умолчанию |
-| :--- | :--- | :--- |
-| `POSTGRES_DB` | Имя базы данных | `avito_pr_db` |
-| `POSTGRES_USER` | Пользователь БД | `postgres` |
-| `POSTGRES_PASSWORD` | Пароль БД | `postgres` |
-| `POSTGRES_HOST` | Хост БД (в Docker это имя сервиса) | `db` |
-| `POSTGRES_PORT` | Порт БД | `5432` |
-
 Сервис будет доступен по адресу: `http://localhost:8080`
 
 Интерактивная документация (Swagger): `http://localhost:8080/docs`
@@ -53,6 +43,16 @@ pip install -r requirements-dev.txt
 ```
 
 По `.env.example` создать `.env` файл и заполнить его.
+
+## ⚙️ Конфигурация (.env)
+
+| Переменная | Описание | Значение по умолчанию |
+| :--- | :--- | :--- |
+| `POSTGRES_DB` | Имя базы данных | `avito_pr_db` |
+| `POSTGRES_USER` | Пользователь БД | `postgres` |
+| `POSTGRES_PASSWORD` | Пароль БД | `postgres` |
+| `POSTGRES_HOST` | Хост БД (в Docker это имя сервиса) | `db` |
+| `POSTGRES_PORT` | Порт БД | `5432` |
 
 
 ### Проверка качества кода
