@@ -12,7 +12,11 @@
 
 ## Запуск
 
-1. Скачать этот репозиторий с Github 
+1. Скачать этот репозиторий с GitHub 
+```
+git clone https://github.com/Bar1o/pr-avito-project.git
+cd pr-avito-project
+```
 2. По `.env.example` создать `.env` файл и заполнить его
 3. Запустить докер командой
 ```bash
