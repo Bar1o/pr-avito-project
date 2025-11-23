@@ -1,23 +1,14 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from contextlib import asynccontextmanager
-from app.api.endpoints import pull_requests, teams, users  # Added users
-from app.db.session import engine
+
+from app.api.endpoints import pull_requests, teams, users
 from app.models import Base
-from app.schemas.errors import ServiceException, ErrorResponse, ErrorDetails
+from app.schemas.errors import ErrorDetails, ErrorResponse, ServiceException
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    yield
-
-    await engine.dispose()
-
-
-app = FastAPI(title="Avito PR Service", lifespan=lifespan)
+app = FastAPI(title="Avito PR Service")
 
 
 @app.exception_handler(ServiceException)
