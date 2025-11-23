@@ -19,7 +19,7 @@
 docker-compose up
 ```
 
-Чтобы остановиться сервис: 
+Чтобы остановить сервис: 
 ```bash
 docker-compose down
 ```
