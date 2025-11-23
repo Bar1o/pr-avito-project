@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.session import get_db
-from app.schemas.schemas import Team, TeamResponseWrapper
-from app.schemas.errors import ErrorResponse
-from app.services.team_service import TeamService
 
+from app.db.session import get_db
+from app.schemas.errors import ErrorResponse
+from app.schemas.schemas import Team
+from app.services.team_service import TeamService
 
 router = APIRouter()
 
@@ -32,6 +32,8 @@ async def add_team(team_data: Team, db: AsyncSession = Depends(get_db)):
         404: {"model": ErrorResponse, "description": "Команда не найдена"},
     },
 )
-async def get_team(team_name: str = Query(..., description="Уникальное имя команды"), db: AsyncSession = Depends(get_db)):
+async def get_team(
+    team_name: str = Query(..., description="Уникальное имя команды"), db: AsyncSession = Depends(get_db)
+):
     service = TeamService(db)
     return await service.get_team(team_name)

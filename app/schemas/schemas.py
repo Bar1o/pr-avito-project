@@ -1,7 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field
-from typing import List, Optional
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # --- Enums ---
@@ -19,7 +19,7 @@ class TeamMember(BaseModel):
 
 class Team(BaseModel):
     team_name: str
-    members: List[TeamMember]
+    members: list[TeamMember]
 
 
 class User(BaseModel):
@@ -41,9 +41,9 @@ class PullRequest(BaseModel):
     pull_request_name: str
     author_id: str
     status: PRStatus
-    assigned_reviewers: List[str]
-    created_at: Optional[datetime] = Field(None, serialization_alias="createdAt")
-    merged_at: Optional[datetime] = Field(None, serialization_alias="mergedAt")
+    assigned_reviewers: list[str]
+    created_at: datetime | None = Field(None, serialization_alias="createdAt")
+    merged_at: datetime | None = Field(None, serialization_alias="mergedAt")
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
@@ -89,4 +89,4 @@ class ReassignResponse(BaseModel):
 
 class UserReviewsResponse(BaseModel):
     user_id: str
-    pull_requests: List[PullRequestShort]
+    pull_requests: list[PullRequestShort]

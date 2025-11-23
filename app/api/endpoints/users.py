@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.db.session import get_db
-from app.schemas.schemas import UserIsActiveUpdate, UserResponseWrapper, UserReviewsResponse
 from app.schemas.errors import ErrorResponse
+from app.schemas.schemas import UserIsActiveUpdate, UserResponseWrapper, UserReviewsResponse
 from app.services.user_service import UserService
 
 router = APIRouter()
@@ -29,6 +30,8 @@ async def set_is_active(data: UserIsActiveUpdate, db: AsyncSession = Depends(get
         404: {"model": ErrorResponse, "description": "Пользователь не найден"},
     },
 )
-async def get_user_reviews(user_id: str = Query(..., description="Идентификатор пользователя"), db: AsyncSession = Depends(get_db)):
+async def get_user_reviews(
+    user_id: str = Query(..., description="Идентификатор пользователя"), db: AsyncSession = Depends(get_db)
+):
     service = UserService(db)
     return await service.get_user_reviews(user_id)

@@ -1,8 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.db.session import get_db
-from app.schemas.schemas import PullRequestCreate, PRResponseWrapper, PullRequestMerge, PullRequestReassign, ReassignResponse
-from app.schemas.errors import ErrorResponse
+from app.docs.pr_docs import create_pr_responses, merge_pr_responses, reassign_pr_responses
+from app.schemas.schemas import (
+    PRResponseWrapper,
+    PullRequestCreate,
+    PullRequestMerge,
+    PullRequestReassign,
+    ReassignResponse,
+)
 from app.services.pr_service import PRService
 
 router = APIRouter()
@@ -12,11 +19,7 @@ router = APIRouter()
     "/create",
     response_model=PRResponseWrapper,
     status_code=201,
-    responses={
-        201: {"description": "PR создан"},
-        404: {"model": ErrorResponse, "description": "Автор/команда не найдены"},
-        409: {"model": ErrorResponse, "description": "PR уже существует"},
-    },
+    responses=create_pr_responses,
 )
 async def create_pull_request(data: PullRequestCreate, db: AsyncSession = Depends(get_db)):
     service = PRService(db)
@@ -26,10 +29,7 @@ async def create_pull_request(data: PullRequestCreate, db: AsyncSession = Depend
 @router.post(
     "/merge",
     response_model=PRResponseWrapper,
-    responses={
-        200: {"description": "PR в состоянии MERGED"},
-        404: {"model": ErrorResponse, "description": "PR не найден"},
-    },
+    responses=merge_pr_responses,
 )
 async def merge_pr(data: PullRequestMerge, db: AsyncSession = Depends(get_db)):
     service = PRService(db)
@@ -39,11 +39,7 @@ async def merge_pr(data: PullRequestMerge, db: AsyncSession = Depends(get_db)):
 @router.post(
     "/reassign",
     response_model=ReassignResponse,
-    responses={
-        200: {"description": "Переназначение выполнено"},
-        404: {"model": ErrorResponse, "description": "PR или пользователь не найден"},
-        409: {"model": ErrorResponse, "description": "Нарушение доменных правил"},
-    },
+    responses=reassign_pr_responses,
 )
 async def reassign_reviewer(data: PullRequestReassign, db: AsyncSession = Depends(get_db)):
     service = PRService(db)

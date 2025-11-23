@@ -1,9 +1,10 @@
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.repositories.user_repository import UserRepository
-from app.schemas.schemas import Team, TeamMember, TeamResponseWrapper
+
 from app.models import TeamDB, UserDB
-from app.schemas.errors import ServiceException, ErrorCode
-from sqlalchemy import select, delete
+from app.repositories.user_repository import UserRepository
+from app.schemas.errors import ErrorCode, ServiceException
+from app.schemas.schemas import Team, TeamMember
 
 
 class TeamService:
@@ -38,7 +39,9 @@ class TeamService:
         incoming_user_ids = {member.user_id for member in data.members}
         ids_to_delete = current_user_ids - incoming_user_ids
         if ids_to_delete:
-            stmt_delete = delete(UserDB).where((UserDB.team_name == data.team_name) & (UserDB.user_id.in_(ids_to_delete)))
+            stmt_delete = delete(UserDB).where(
+                (UserDB.team_name == data.team_name) & (UserDB.user_id.in_(ids_to_delete))
+            )
             await self.session.execute(stmt_delete)
 
         team = TeamDB(team_name=data.team_name)
@@ -61,6 +64,8 @@ class TeamService:
         if not team_db:
             raise ServiceException(ErrorCode.NOT_FOUND, f"team {team_name} not found", 404)
 
-        members_dto = [TeamMember(user_id=u.user_id, username=u.username, is_active=u.is_active) for u in team_db.members]
+        members_dto = [
+            TeamMember(user_id=u.user_id, username=u.username, is_active=u.is_active) for u in team_db.members
+        ]
 
         return Team(team_name=team_db.team_name, members=members_dto)

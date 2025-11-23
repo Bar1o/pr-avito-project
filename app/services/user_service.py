@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.repositories.user_repository import UserRepository
-from app.schemas.schemas import UserIsActiveUpdate, UserResponseWrapper, UserReviewsResponse, PullRequestShort, User
-from app.schemas.errors import ServiceException, ErrorCode
+from app.schemas.errors import ErrorCode, ServiceException
+from app.schemas.schemas import PullRequestShort, User, UserIsActiveUpdate, UserResponseWrapper, UserReviewsResponse
 
 
 class UserService:
@@ -33,7 +34,10 @@ class UserService:
 
         prs_dto = [
             PullRequestShort(
-                pull_request_id=pr.pull_request_id, pull_request_name=pr.pull_request_name, author_id=pr.author_id, status=pr.status
+                pull_request_id=pr.pull_request_id,
+                pull_request_name=pr.pull_request_name,
+                author_id=pr.author_id,
+                status=pr.status,
             )
             for pr in user.assigned_prs
         ]

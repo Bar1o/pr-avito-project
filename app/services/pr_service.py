@@ -1,11 +1,13 @@
 import random
 from datetime import datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models import PullRequestDB
 from app.repositories.pr_repository import PRRepository
 from app.repositories.user_repository import UserRepository
-from app.schemas.schemas import PullRequestCreate, PRResponseWrapper, ReassignResponse, PullRequest
-from app.schemas.errors import ServiceException, ErrorCode
+from app.schemas.errors import ErrorCode, ServiceException
+from app.schemas.schemas import PRResponseWrapper, PullRequest, PullRequestCreate, ReassignResponse
 
 
 class PRService:
@@ -88,7 +90,11 @@ class PRService:
 
         team_members = await self.user_repo.get_team_members(old_user.team_name)
 
-        candidates = [u for u in team_members if u.is_active and u.user_id != pr.author_id and u.user_id not in current_reviewer_ids]
+        candidates = [
+            u
+            for u in team_members
+            if u.is_active and u.user_id != pr.author_id and u.user_id not in current_reviewer_ids
+        ]
         if not candidates:
             raise ServiceException(ErrorCode.NO_CANDIDATE, "no active replacement candidate", 409)
 
