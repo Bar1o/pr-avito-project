@@ -46,12 +46,12 @@ class PRServiceUser(HttpUser):
 
                 if "pr" in data:
                     pr_obj = data["pr"]
-                    self.active_prs.append({"id": pr_obj["pull_request_id"], "reviewers": pr_obj.get("assigned_reviewers", [])})
+                    self.active_prs.append(
+                        {"id": pr_obj["pull_request_id"], "reviewers": pr_obj.get("assigned_reviewers", [])}
+                    )
                 else:
-
                     logging.error(f"Unexpected response structure: {data}")
             elif response.status_code == 409:
-
                 response.success()
             else:
                 response.failure(f"Create PR failed: {response.status_code}")
